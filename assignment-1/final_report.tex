@@ -1,0 +1,871 @@
+	\documentclass[a4paper]{article}
+\newcommand{\dd}[1]{\mathrm{d}#1}
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+%% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{braket}
+\usepackage{amssymb}
+\usepackage{subcaption}
+\usepackage[section]{placeins}
+\usepackage{float}
+\usepackage{color}
+\restylefloat{table}
+
+\title{Bayesian Classification Model}
+\author{Shreyas Bapat, Bhavya Bhatt, GaganDeep Tomar}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+The following discussion revolves around the modelling of data classifier in accordance with Bayesian Decision Theory. We then apply the model on three differnt kinds of dataset which are precisly - linearly separable, non-linearly separable and actual data which can be of random nature. The goal is to compare the performance of the model with the above datasets under different conditions on covariance matrix.   
+\end{abstract}
+
+\section{Introduction}
+
+The Bayesian Decision Theory is a probablistic theory for classifying the data points on the basics of pre-known prior and class conditional probabilities(which in real scenario is not known in any closed form expression). We give below the basics of Bayes rule in the context of pattern recognition.
+\subsection{Bayes Rule}
+The bayes rule states that if we have prior probabilities of a class and we know class conditional probability for each class then given a sample data point we can find the probability that it belongs to some particular class $i$ as follows
+\begin{equation}\label{bayes equation}
+P(C_{i}|\bar{x}) = \frac{P(\bar{x}|C_{i})P(C_{i})}{\sum_{j=1}^{m}P(\bar{x}|C_{j})P(C_{j})}
+\end{equation} Where $P(C_{i})$ is prior probablity of class $i$ and $P(\bar{x}|C_{i})$ is class conditional probablity. Then we can find to which class the data point belong to as follows
+\begin{equation}
+C = \{C_{i}, max\{P(C_{i}|\bar{x}), i=1\dots m\}\}
+\end{equation} where $m$ is the number of classes.
+\subsection{Assumptions}
+In the above equation $\ref{bayes equation}$ we have to have $P(C_{i})$ and $P(\bar{x}|C_{i})$ for the classification. We can obtain prior probablity by observing the training dataset. The ad-hoc assumption in our model is that class conditional probablity is considered to be normal distributed with parameters $\mu_{i}$ and $\sigma_{i}^{2}$ which are mean and variance of the dataset belonging to that particular class $i$. Note that the above parameters are scalar in univariate case(dimension of data point is one) but they would be a vector (mean vector)and a matrix(covariance matrix) respectively in bivariate and multivariate case. The expression for multidimensional gaussian distribution is
+\begin{equation}
+P(\bar{x}|C_{i}) = \frac{1}{\sqrt{det(2\pi\mathbf{\Sigma_{i}})}}exp\{\frac{-1}{2}(\bar{x}-\bar{\mu_{i}})^{\intercal}\mathbf{\Sigma_{i}}^{-1}(\bar{x}-\bar{\mu_{i}})\}
+\end{equation}Where $\bar{\mu_{i}}$ is mean vector of class $i$ and $\mathbf{\Sigma_{i}}$ is covariance matrix of class $i$.
+\section{Coutour Curves and Covariance Matrix}\label{appendix}
+In this section\footnote{for a complete discussion refer to the appendix} we discuss the relation between the shape of the cross section produced by slicing the bivariate gaussian distribution with a hyperplane parallel to the 2D-feature plane and covariance matrix. The bivariate gaussian distribution is a follows
+\begin{equation}
+P(\bar{x}|C_{i}) = \frac{1}{\sqrt{det(2\pi\mathbf{\Sigma_{i}})}}exp\{\frac{-1}{2}(\bar{x}-\bar{\mu_{i}})^{\intercal}\mathbf{\Sigma_{i}}^{-1}(\bar{x}-\bar{\mu_{i}})\}
+\end{equation}with $mu_{i}$ be a $2\times1$ mean column vector and $\Sigma_{i}$ be $2\times2$ covariance matrix. So we assume the covariance matrix in its expanded form as
+\[
+\mathbf{\Sigma} = \left[ {\begin{array}{cc}
+\Sigma_{11} & \Sigma_{12} \\
+\Sigma_{12} & \Sigma_{22} \\
+\end{array}} \right]
+\]
+where diagonal terms are variance of the features and off-diagonal terms are covariance bewteen feature-1 and feature-2. The above matrix is symmetric precisly due to the fact that $cov(x_{i}, x_{j})=cov(x_{j}, x_{i})$. Now we set the above distribution function to some constant $k$ and find the resultant curve projected on the feature space which is called constant contour curve.
+\[
+\frac{1}{\sqrt{det(2\pi\mathbf{\Sigma_{i}})}}exp\{\frac{-1}{2}(\bar{x}-\bar{\mu_{i}})^{\intercal}\mathbf{\Sigma_{i}}^{-1}(\bar{x}-\bar{\mu_{i}})\} = k
+\]after some manupilation and taking log both sides we get
+\[
+(\bar{x}-\bar{\mu})^{\intercal}\mathbf{\Sigma}^{-1}(\bar{x}-\bar{\mu})=-2\ln(\sqrt{2\pi\left|\mathbf{\Sigma}\right|}k)
+\]where we have dropped the index $i$ for simplicity and the whole analysis can be done without the loss of generality. Now writing the matrix in full and evaluating the required operation on the column vector we get finally
+\begin{equation}\label{cov}
+\Sigma_{22}X_{1}^{2} + \Sigma_{11}X_{2}^{2} - 2\Sigma_{12}X_{1}X_{2} + 2\ln(\sqrt{2\pi\left|\mathbf{\Sigma}\right|}k)=0
+\end{equation}where $\bar{x}=\left[x_{1}x_{2}\right]^{\intercal}$, $\bar{\mu}=\left[\mu_{1} \mu_{2}\right]^{\intercal}$, $X_{1}=x_{1}-\mu_{1}$ and $X_{2}=x_{2}-\mu_{2}$. This equation is in the form of general equation for conic section
+\begin{equation}
+ax^{2}+by^{2}+cxy+d=0
+\end{equation}Now in our case the coefficients $a$ and $b$ are $\Sigma_{22}$ and $\Sigma_{11}$ respectively. The above equation thus represents an ellipse in our case as variances are always positive values. Now from the elementary analysis of conics we know that the coefficient of $xy$ represent the extend to which the ellipse is titled w.r.t to the axis. Also the coefficients of $x^{2}$ and $y^{2}$ represents the length of major and minor axis respectively. Now we consider $\Sigma_{12}=0$ (covariance matrix is diagonal) then the we recover the familiar equation of ellipse with major and minor axis parallel to the x-y axis. The equation is
+\begin{equation}
+\frac{X_{1}^{2}}{\left(\frac{-2\ln(\sqrt{2\pi\left|\mathbf{\Sigma}\right|}k)}{\Sigma_{22}}\right)}+\frac{X_{2}^{2}}{\left(\frac{-2\ln(\sqrt{2\pi\left|\mathbf{\Sigma}\right|}k)}{\Sigma_{11}}\right)}=1
+\end{equation}which is of the form
+\[
+\frac{x^{2}}{A^{2}}+\frac{y^{2}}{B^{2}}=1
+\]the above is the equation of countour curve projected in the feature space. Now we consider following three cases
+\[
+\Sigma_{22} < \Sigma_{11}\rightarrow A > B \hspace{0.5cm} ellipse
+\]
+\[
+\Sigma_{22} = \Sigma_{11}\rightarrow A=B \hspace{0.5cm} circle
+\]
+\[
+\Sigma_{22} > \Sigma_{11}\rightarrow A < B \hspace{0.5cm} ellipse
+ \] 
+\section{Training and Testing}
+In the presented work we would be taking test size of $0.25$. We would use training data points to train our classifier and testing data points to analyse the performance of the trained model(by performance we mean the ability of the model to correctly classify the unseen data points $i.e$ training examples). Training the model has different meaning for different models, here training means calculating the covariance matrix using training dataset and obtaining the required decision boundary.
+\subsection{Discriminant function}
+The decision boundary is represented mathematically using discriminant function. For Bayes Classifier, the discriminant function is as follows
+\begin{equation}
+f(\bar{x}) = g_{i}(\bar{x}) - g_{j}(\bar{x})
+\end{equation}where $g_{i}(\bar{x})$ is
+\begin{equation}
+g_{i}(\bar{x}) = \ln(P(C_{i}|\bar{x}))
+\end{equation}We observe that $f(\bar{x})=0$ is the equation for decision boundary. And $f(\bar{x})>0$ the data point belongs to class $i$ and $f(\bar{x})<0$ the data point belongs to class $j$. Now we know that $P(C_{i}|\bar{x})=P(\bar{x}|C_{i})P(C_{i})$ and taking logarithm simplfies the expression for the discriminant function\footnote{for more insight you can refer to the textbook, R.O.Duda, D.G.Stork Pattern Classification-wiley}. We have omitted the total probability term in the denominator because it is same for all the classes and does not contribute to the classifion process.
+\section{Performance of the model}
+In this section\footnote{Note that in the further discussion class-1 red, class-2 green, class-3 blue} we start our actual task of performance check on three different datasets. The analysis includes for each dataset we have considered four cases on covariance matrix which are as follows
+\begin{itemize}
+\item Covariance matrix for all the classes is the same and is $\sigma^{2}\mathbf{I}$.
+\item Full Covariance matrix for all the classes is the same and is $\mathbf{\Sigma}$.
+\item Covariance matric is diagonal and is different for each class
+\item Full Covariance matrix for each class is different
+\end{itemize}
+and for each such case we calculate
+\begin{itemize}
+\item Classification accuracy, precision for every class, mean precision, recall for
+every class, mean recall, F-measure for every class and mean F-measure on
+test data
+\item Confusion matrix\footnote{Note that entry $C_{ij}$ of confusion matrix represents number of points known to be in class $i$ but classified as class $j$} based on the performance for test data
+\item Constant density contour plot for all the classes together with the training data
+superposed
+\item Decision region plot for every pair of classes together with the training data
+superposed
+\item Decision region plot for all the classes together with the training data
+superposed
+\end{itemize}
+\newpage
+\subsection{Dataset-1}
+This dataset contains two types of two dimensional data points - linearly separable and non-linearly separable. Both have classification among three classes.
+\subsubsection{Linearly Separable}
+First we show the scatter plots of the data points in training dataset.
+\begin{figure}[h!]
+  \includegraphics[width=0.7\linewidth]{1_12.png}
+  \caption{Dataset-1: Linearly Separable}
+  \label{fig:Linearly Separable}
+\end{figure}
+
+As we can see from the figure \ref{fig:Linearly Separable} the data points are linearly separable. Now we consider the four stated cases on this dataset.
+\newpage
+\paragraph{Case-1: $\mathbf{\Sigma_{i}}=\sigma^{2}\mathbf{1}$}
+According to the theory considered for this model we get a linear\footnote{linear means that if feature is two dimensional then it is a line, if three dimensional it is a hyperplane and similarly for higher dimensions} discriminant function of the form
+\begin{equation}
+\mathbf{w^{\intercal}}(\bar{x}-\bar{x_{0}})=0
+\end{equation}
+\[
+\mathbf{w} = \bar{\mu_{i}}-\bar{\mu_{j}}
+\]
+\[
+\bar{x_{0}} = \frac{1}{2}(\bar{\mu_{i}}+\bar{\mu_{j}})-\frac{\sigma^{2}}{\mid\mid \bar{\mu_{i}}-\bar{\mu_{j}}\mid\mid^{2}}\ln\frac{P(C_{i})}{P(C_{j})}(\bar{\mu_{i}}-\bar{\mu_{j}})
+\]
+where $\mathbf{w}$ is weight matrix and $\bar{x_{0}}$ through which the decision boundary(linear) passes. The decision surface between each pair of three classes are shown in figure \ref{fig:1_1}. Now we state the performance parameters obtained by testing the classifier on the test dataset(0.25).  
+
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{1_12_1.png}
+     \caption{case-1: class-1 class-2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{1_23_1.png}
+    \caption{case-1: class-2 class-3}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{1_31_1.png}
+    \caption{case-1: class-3 class-1}
+  \end{subfigure}
+  \caption{Decision Boundary and Training Data points for Linearly Seperable Dataset-1, Case-1}
+  \label{fig:1_1}
+\end{figure}
+
+\subparagraph{Confusion Matrix}
+The confusion matrix obtained is
+\[
+\mathbf{M} = \left[ {\begin{array}{ccc}
+375 & 0 & 0\\
+0 & 375 & 0\\
+0 & 0 & 375\\
+\end{array}} \right]
+\]We observe here is that even though the diagonal terms (correctly classified) are appreciable but the cross diagonal terms suggest that this case of covariance matrix cannot be a pratical approximation for the dataset.
+\subparagraph{Precision, Recall and F-measure} \textcolor{white}{:}
+\begin{table}[H]
+  \begin{center}
+    \caption{Performance parameters for Linearly Seperable Dataset-1, Case -1}
+    \label{tab:table1}
+    \begin{tabular}{l|c|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{class} & \textbf{Recall} & \textbf{Precision} & \textbf{F-Measure}\\
+      \hline
+      class-1 & 0.6639344262 & 0.3875598086 & 0.4894259819\\
+      class-2 & 0.72 & 0.4812834225 & 0.5769230769\\
+      class-3 & 0.184 & 0.5187165775 & 0.271642518\\
+    \end{tabular}
+  \end{center}
+\end{table}
+$\mathbf{Accuracy}$ 43.66$ \%,$ $\mathbf{Mean- Precision}$ 0.4625$ ,$ $\mathbf{Mean- Recall}$ 0.522$.$
+\paragraph{Case-2: $\mathbf{\Sigma_{i}}=\mathbf{\Sigma}$}
+According to the theory considered for this model we get a linear\footnote{linear means that if feature is two dimensional then it is a line, if three dimensional it is a hyperplane and similarly for higher dimensions} discriminant function of the form
+\begin{equation}
+\mathbf{w^{\intercal}}(\bar{x}-\bar{x_{0}})=0
+\end{equation}
+\[
+\mathbf{w} = \mathbf{\Sigma}^{-1}(\bar{\mu_{i}}-\bar{\mu_{j}})
+\]
+\[
+\bar{x_{0}} = \frac{1}{2}(\bar{\mu_{i}}+\bar{\mu_{j}})-\frac{\ln(P(C_{i}))-\ln(P(C_{j}))}{(\bar{\mu_{i}}-\bar{\mu_{j}})^{\intercal}\mathbf{\Sigma}^{-1}(\bar{\mu_{i}}-\bar{\mu_{j}})}(\bar{\mu_{i}}-\bar{\mu_{j}})
+\]
+where $\mathbf{w}$ is weight matrix and $\bar{x_{0}}$ through which the decision boundary(linear) passes. The decision surface between each pair of three classes are shown in figure \ref{fig:1_2}. 
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{1_12_2.png}
+     \caption{case-2: class-1 class-2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{1_23_2.png}
+    \caption{case-2: class-2 class-3}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{1_31_2.png}
+    \caption{case-2: class-3 class-1}
+  \end{subfigure}
+  \caption{Decision Boundary and Training Data points for Linearly Seperable Dataset-1, Case-2}
+  \label{fig:1_2}
+\end{figure}
+Now we state the performance parameters obtained by testing the classifier on the test dataset(0.25).
+\subparagraph{Confusion Matrix}\label{reason}
+The confusion matrix obtained is
+\[
+\mathbf{M} = \left[ {\begin{array}{ccc}
+375 & 0 & 0\\
+0 & 375 & 0\\
+0 & 0 & 375\\
+\end{array}} \right]
+\]We can observe that this is performing even worst as it has two diagonal terms equal to zero which means it does not correctly classify any point in class $1$ and class $2$. So this also is not a realisitic approximation of the covariance matrix.
+
+\subparagraph{Precision, Recall and F-measure}\textcolor{white}{:}
+\begin{table}[H]
+  \begin{center}
+    \caption{Performance parameters for Linearly Seperable Dataset-1, Case -2}
+    \label{tab:table1}
+    \begin{tabular}{l|c|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{class} & \textbf{Recall} & \textbf{Precision} & \textbf{F-Measure}\\
+      \hline
+      class-1 & 0 & 0 & NaN\\
+      class-2 & 0 & 0 & NaN\\
+      class-3 & 0.816 & 0.449339207 & 0.5795454545\\
+    \end{tabular}
+  \end{center}
+\end{table}
+$\mathbf{Accuracy}$ 40.8$\%,$ $\mathbf{Mean -Precision}$ 0.149$,$ $\mathbf{Mean- Recall}$ 0.272$.$
+\paragraph{Case-3: $\mathbf{\Sigma_{i}}$ is diagonal and different}
+According to the theory considered for this model we get a non-linear discriminant function of the form
+\begin{equation}\label{eq:non-linear}
+g_{i}(\bar{x}) = \bar{x}^{\intercal}\mathbf{W_{i}}\bar{x}+\bar{w_{i}}^{\intercal}\bar{x}+\omega_{i0}
+\end{equation}
+\[
+\mathbf{W_{i}} = \frac{-1}{2}\mathbf{\Sigma_{i}}^{\intercal}
+\]
+\[
+w_{i} = \mathbf{\Sigma_{i}}^{-1}\bar{\mu_{i}}
+\]
+\[
+\omega_{i0} = \frac{-1}{2}\bar{\mu_{i}}^{\intercal}\mathbf{\Sigma_{i}}^{-1}\bar{\mu_{i}}-\frac{1}{2}\ln(\left|\mathbf{\Sigma_{i}}\right|)+\ln(P(C_{i}))
+\]. From equation the decision surface between each pair of three classes would be non-linear as shown in figure \ref{fig:1_3}
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{1_12_3.png}
+     \caption{case-3: class-1 class-2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{1_23_3.png}
+    \caption{case-3: class-2 class-3}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{1_31_3.png}
+    \caption{case-3: class-3 class-1}
+  \end{subfigure}
+  \caption{Decision Boundary and Training Data points for Linearly Seperable Dataset-1, Case-3}
+  \label{fig:1_3}
+\end{figure}
+\subparagraph{Confusion Matrix}
+The confusion matrix obtained is
+\[
+\mathbf{M} = \left[ {\begin{array}{ccc}
+375 & 0 & 0\\
+0 & 375 & 0\\
+0 & 0 & 375\\
+\end{array}} \right]
+\]This shows that off diagonal terms are appreciably decreased which makes this approximation to be reasonable one for this dataset.
+
+\subparagraph{Precision, Recall and F-measure}\textcolor{white}{:}
+\begin{table}[h!]
+  \begin{center}
+    \caption{Performance parameters for Linearly Seperable Dataset-1, Case -3}
+    \label{tab:table1}
+    \begin{tabular}{l|c|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{class} & \textbf{Recall} & \textbf{Precision} & \textbf{F-Measure}\\
+      \hline
+      class-1 & 0.96 & 0.9230769231 & 0.9411764706\\
+      class-2 & 0.936 & 0.9590163934 & 0.9473684211\\
+      class-3 & 0.9959677419 & 0.9959677419 & 0.9959677419\\
+    \end{tabular}
+  \end{center}
+\end{table}
+\\$\mathbf{Accuracy}$ 96.8$\%,$ $\mathbf{Mean -Precision}$ 0.959$,$ $\mathbf{Mean- Recall}$ 0.963$.$
+\newpage
+\paragraph{Case-4: $\mathbf{\Sigma_{i}}$ is arbitary}
+In this case also we can use the equation \ref{eq:non-linear}. The decision surface  between each pair of three classes would again be non-linear as shown in figure \ref{fig:1_4}
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{1_12_4.png}
+     \caption{case-4: class-1 class-2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{1_23_4.png}
+    \caption{case-4: class-2 class-3}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{1_31_4.png}
+    \caption{case-4: class-3 class-1}
+  \end{subfigure}
+  \caption{Decision Boundary and Training Data points for Linearly Seperable Dataset-1, Case-4}
+  \label{fig:1_4}
+\end{figure}
+\subparagraph{Confusion Matrix}
+The confusion matrix obtained is
+\[
+\mathbf{M} = \left[ {\begin{array}{ccc}
+375 & 0 & 0\\
+0 & 375 & 0\\
+0 & 0 & 375\\
+\end{array}} \right]
+\]This also performs similar to that of the previous case.
+
+\subparagraph{Precision, Recall and F-measure}\textcolor{white}{:}
+\footnote{The discriminant functions discussed above for all the different cases would be same for all the subsequent datasets}
+\begin{table}[h!]
+  \begin{center}
+    \caption{Performance parameters for Linearly Seperable Dataset-1, Case -4}
+    \label{tab:table1}
+    \begin{tabular}{l|c|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{class} & \textbf{Recall} & \textbf{Precision} & \textbf{F-Measure}\\
+      \hline
+      class-1 & 0.952 & 0.9224806202 & 0.937007874\\
+      class-2 & 0.936 & 0.9512195122 & 0.9435483871\\
+      class-3 & 0.9959677419 & 0.9959677419 & 0.9959677419\\
+    \end{tabular}
+  \end{center}
+\end{table}
+\\$\mathbf{Accuracy}$ 96.6$\%,$ $\mathbf{Mean- Precision}$ 0.956$, \mathbf{Mean -Recall}$ 0.961$.$
+\newpage
+\subparagraph{Conclusion}
+The best performance is given by case-$3$ and worst performance is given by case-$2$. Now we shown the final decision boundary simultaneously for all the three classes and for all the four cases along with their contour plots superimposed on them in figure \ref{fig:cont_1_4}
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{cont_1_123_1.png}
+     \caption{case-1: interclass decision surface and contour plot}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{cont_1_123_2.png}
+    \caption{case-2: interclass decision surface and contour plot}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{cont_1_123_3.png}
+    \caption{case-3: interclass decision surface and contour plot}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{cont_1_123_4.png}
+    \caption{case-4: interclass decision surface and contour plot}
+  \end{subfigure}
+  \caption{decision boundary for all three classes and contour plots}
+  \label{fig:cont_1_4}
+\end{figure}
+\goodbreak \newpage \newpage
+\subsubsection{Non-Linearly separable}
+First we show the scatter plots of the data points in training dataset.
+\begin{figure}[!h]
+  \includegraphics[width=0.7\linewidth]{2.png}
+  \caption{Dataset-1: Non-Linearly Separable}
+  \label{fig:Non Linearly Separable}
+\end{figure}
+As we can see from the figure \ref{fig:Non Linearly Separable} the data points are not linearly separable. Now we consider the four stated cases on this dataset.
+\newpage
+\paragraph{Case-1: $\mathbf{\Sigma_{i}}=\sigma^{2}\mathbf{1}$} 
+The decision boudary between each pair of classes is shown in figure \ref{fig:2_1}
+\begin{figure}[h]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{2_12_1.png}
+     \caption{case-1: class-1 class-2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{2_23_1.png}
+    \caption{case-1: class-2 class-3}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{2_31_1.png}
+    \caption{case-1: class-3 class-1}
+  \end{subfigure}
+  \caption{Decision Boundary and Training Data points for Non-Linearly Seperable Dataset-1, Case-1}
+  \label{fig:2_1}
+\end{figure}
+\subparagraph{Confusion Matrix}
+The confusion matrix obtained is
+\[
+\mathbf{M} = \left[ {\begin{array}{ccc}
+272 & 0 & 103\\
+67 & 263 & 43\\
+308 & 300 & 142\\
+\end{array}} \right]
+\]We can observe here that cross-diagonal terms are exceptionally greater than diagonal terms so this is not a good approximation for the dataset.
+
+\subparagraph{Precision, Recall and F-measure}:
+\begin{table}[h!]
+  \begin{center}
+    \caption{Performance parameters for Non-Linearly Seperable Dataset-1, Case -1}
+    \label{tab:table1}
+    \begin{tabular}{l|c|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{class} & \textbf{Recall} & \textbf{Precision} & \textbf{F-Measure}\\
+      \hline
+      class-1 & 0.6639344262 & 0.4358974359 & 0.526275559\\
+      class-2 & 0.768 & 0.4571428571 & 0.5731343284\\
+      class-3 & 0.192 & 0.5052631579 & 0.2782608696\\
+    \end{tabular}
+  \end{center}
+\end{table}
+\\
+$\mathbf{Accuracy}$ 45.8$\%,$ $\mathbf{Mean- Precision}$ 0.466$,$ $\mathbf{Mean -Recall}$ 0.541$.$
+\newpage
+\paragraph{Case-2: $\mathbf{\Sigma_{i}}=\mathbf{\Sigma}$}
+
+The decision boundary between each pair of classes is shown in figure \ref{fig:2_2}
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{2_12_2.png}
+     \caption{case-2: class-1 class-2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{2_23_2.png}
+    \caption{case-2: class-2 class-3}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{2_31_2.png}
+    \caption{case-2: class-3 class-1}
+  \end{subfigure}
+  \caption{Decision Boundary and Training Data points for Non-Linearly Seperable Dataset-1, Case-2}
+  \label{fig:2_2}
+\end{figure}
+\subparagraph{Confusion Matrix}
+The confusion matrix obtained is
+\[
+\mathbf{M} = \left[ {\begin{array}{ccc}
+0 & 0 & 375\\
+0 & 0 & 375\\
+114 & 5 & 631\\
+\end{array}} \right]
+\]This is performing worst\footnote{same reason as given in section \ref{reason}}.\\
+
+\subparagraph{Precision, Recall and F-measure} \textcolor{white}{:}
+\begin{table}[h!]
+  \begin{center}
+    \caption{Performance parameters for Non-Linearly Seperable Dataset-1, Case -2}
+    \label{tab:table1}
+    \begin{tabular}{l|c|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{class} & \textbf{Recall} & \textbf{Precision} & \textbf{F-Measure}\\
+      \hline
+      class-1 & 0 & 0 & NaN\\
+      class-2 & 0 & 0 & NaN\\
+      class-3 & 0.796 & 0.4432071269 & 0.5693848355\\
+    \end{tabular}
+  \end{center}
+\end{table}
+\\
+$\mathbf{Accuracy}$ 39.8$\%,$ $\mathbf{Mean- Precision}$ 0.147$,$ $\mathbf{Mean- Recall}$ 0.265$.$
+\newpage
+\paragraph{Case-3: $\mathbf{\Sigma_{i}}$ is diagonal and different} 
+The decision boundary is shown in figure \ref{fig:2_3}
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{2_12_3.png}
+     \caption{case-3: class-1 class-2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{2_23_3.png}
+    \caption{case-3: class-2 class-3}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{2_31_3.png}
+    \caption{case-3: class-3 class-1}
+  \end{subfigure}
+  \caption{Decision Boundary and Training Data points for Non-Linearly Seperable Dataset-1, Case-3}
+  \label{fig:2_3}
+\end{figure}
+\subparagraph{Confusion Matrix}
+The confusion matrix obtained is
+\[
+\mathbf{M} = \left[ {\begin{array}{ccc}
+348 & 24 & 3\\
+24 & 342 & 9\\
+7 & 0 & 743\\
+\end{array}} \right]
+\]This approximation on covariance matrix is performing fairly good.\\
+
+\subparagraph{Precision, Recall and F-measure} \textcolor{white}{:}
+\begin{table}[h!]
+  \begin{center}
+    \caption{Performance parameters for Non-Linearly Seperable Dataset-1, Case -3}
+    \label{tab:table1}
+    \begin{tabular}{l|c|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{class} & \textbf{Recall} & \textbf{Precision} & \textbf{F-Measure}\\
+      \hline
+      class-1 & 0.872 & 0.9396551724 & 0.9045643154\\
+      class-2 & 0.936 & 0.9285714286 & 0.9322709163\\
+      class-3 & 0.992 & 0.9612403101 & 0.9763779528\\
+    \end{tabular}
+  \end{center}
+\end{table}
+\\$\mathbf{Accuracy}$ 94.8$\%,$ $\mathbf{Mean- Precision}$ 0.943$,$ $\mathbf{Mean- Recall}$ 0.933$.$
+\newpage
+\paragraph{Case-4: $\mathbf{\Sigma_{i}}$ is arbitary}
+The decision boundary is shown in figure \ref{fig:2_4}
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{2_12_4.png}
+     \caption{case-4: class-1 class-2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{2_23_4.png}
+    \caption{case-4: class-2 class-3}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{2_31_4.png}
+    \caption{case-4: class-3 class-1}
+  \end{subfigure}
+  \caption{case-4 Decision Boundary and Training Data points for Non-Linearly Seperable Dataset-1, Case-4}
+  \label{fig:2_4}
+\end{figure}
+\subparagraph{Confusion Matrix}
+The confusion matrix obtained is
+\[
+\mathbf{M} = \left[ {\begin{array}{ccc}
+349 & 26 & 0\\
+23 & 342 & 10\\
+6 & 0 & 744\\
+\end{array}} \right]
+\]This also peforms fairly good similar to the above case.\\
+
+\subparagraph{Precision, Recall and F-measure} \textcolor{white}{:}
+\begin{table}[h!]
+  \begin{center}
+    \caption{Performance parameters for Non-Linearly Seperable Dataset-1, Case -4}
+    \label{tab:table1}
+    \begin{tabular}{l|c|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{class} & \textbf{Recall} & \textbf{Precision} & \textbf{F-Measure}\\
+      \hline
+      class-1 & 0.904 & 0.9416666667 & 0.9224489796\\
+      class-2 & 0.936 & 0.9285714286 & 0.9322709163\\
+      class-3 & 0.992 & 0.9763779528 & 0.9841269841\\
+    \end{tabular}
+  \end{center}
+\end{table}
+\\$\mathbf{Accuracy}$ 95.6$\%,$ $\mathbf{Mean -Precision}$ 0.948$,$ $\mathbf{Mean- Recall}$ 0.944$.$
+\newpage
+\subparagraph{Conclusion}
+The best performance is given by case-$3$ and worst performance is given by case-$2$. Now we shown the final decision boundary simultaneously for all the three classes and for all the four cases along with their contour plots superimposed on them in figure \ref{fig:cont_2_4}
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{cont_2_123_1.png}
+     \caption{case-1: interclass decision surface and contour plot}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{cont_2_123_2.png}
+    \caption{case-2: interclass decision surface and contour plot}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{cont_2_123_3.png}
+    \caption{case-3: interclass decision surface and contour plot}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{cont_2_123_4.png}
+    \caption{case-4: interclass decision surface and contour plot}
+  \end{subfigure}
+  \caption{decision boundary for all three classes and contour plots}
+  \label{fig:cont_2_4}
+\end{figure}
+\newpage
+
+\subsection{Dataset-2}
+This dataset is real dataset and is much more random\footnote{randomness here means that classes can be overlapping also} than the dataset-1 considered above. We carry out similar analysis for this dataset also. First we show the scatter plots of the data points in training dataset in figure \ref{fig:3}
+\begin{figure}[!h]
+  \includegraphics[width=0.7\linewidth]{3.png}
+  \caption{Dataset-2: real dataset}
+  \label{fig:3}
+\end{figure}
+\newpage
+\paragraph{Case-1: $\mathbf{\Sigma_{i}}=\sigma^{2}\mathbf{1}$}
+The decision boundary is shown in figure \ref{fig:3_1}
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{3_12_1.png}
+     \caption{case-1: class-1 class-2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{3_23_1.png}
+    \caption{case-1: class-2 class-3}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{3_31_1.png}
+    \caption{case-1: class-3 class-1}
+  \end{subfigure}
+  \caption{Decision Boundary and Training Data points for Dataset-2, Case-1}
+  \label{fig:3_1}
+\end{figure}
+\subparagraph{Confusion Matrix}
+The confusion matrix obtained is
+\[
+\mathbf{M} = \left[ {\begin{array}{ccc}
+1629 & 211 & 0\\
+298 & 1568 & 0\\
+9 & 8 & 1701\\
+\end{array}} \right]
+\]We observe here that it is performing good with the approximated covariance matrix.\\
+
+\subparagraph{Precision, Recall and F-measure} \textcolor{white}{:}
+\begin{table}[h!]
+  \begin{center}
+    \caption{Performance parameters for Dataset-2, Case-1}
+    \label{tab:table1}
+    \begin{tabular}{l|c|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{class} & \textbf{Recall} & \textbf{Precision} & \textbf{F-Measure}\\
+      \hline
+      class-1 & 0.8713355049 & 0.8546325879 & 0.8629032258\\
+      class-2 & 0.8569131833 & 0.8666666667 & 0.8617623282\\
+      class-3 & 0.9912739965 & 1 & 0.9956178791\\
+    \end{tabular}
+  \end{center}
+\end{table}
+\\$\mathbf{Accuracy}$ 90.4$\%,$ $\mathbf{Mean -Precision}$ 0.907$,$ $\mathbf{Mean- Recall}$ 0.906$.$
+\newpage
+\paragraph{Case-2: $\mathbf{\Sigma_{i}}=\mathbf{\Sigma}$}
+The decision boundary is shown in figure \ref{fig:3_2}
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{3_12_2.png}
+     \caption{case-2: class-1 class-2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{3_23_2.png}
+    \caption{case-2: class-2 class-3}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{3_31_2.png}
+    \caption{case-2: class-3 class-1}
+  \end{subfigure}
+  \caption{Decision Boundary and Training Data points for Dataset-2, Case-2}
+  \label{fig:3_2}
+\end{figure}
+\subparagraph{Confusion Matrix}
+The confusion matrix obtained is
+\[
+\mathbf{M} = \left[ {\begin{array}{ccc}
+1620 & 220 & 0\\
+158 & 1708 & 0\\
+7 & 11 & 1700\\
+\end{array}} \right]
+\]
+\\
+
+\subparagraph{Precision, Recall and F-measure} \textcolor{white}{:}
+\begin{table}[h!]
+  \begin{center}
+    \caption{Performance parameters for Dataset-2, Case-2}
+    \label{tab:table1}
+    \begin{tabular}{l|c|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{class} & \textbf{Recall} & \textbf{Precision} & \textbf{F-Measure}\\
+      \hline
+      class-1 & 0.8680781759 & 0.9126712329 & 0.8898163606\\
+      class-2 & 0.922829582 & 0.896875 & 0.9096671949\\
+      class-3 & 0.9895287958 & 1 & 0.9947368421\\
+    \end{tabular}
+  \end{center}
+\end{table}
+\\$\mathbf{Accuracy}$ 92.5$\%,$ $\mathbf{Mean -Precision}$ 0.936$,$ $\mathbf{Mean -Recall}$ 0.926$.$
+\newpage
+\paragraph{Case-3: $\mathbf{\Sigma_{i}}$ is diagonal and different}
+The decision boundary is shown in figure \ref{fig:3_3}
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{3_12_3.png}
+     \caption{case-3: class-1 class-2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{3_23_3.png}
+    \caption{case-3: class-2 class-3}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{3_31_3.png}
+    \caption{case-3: class-3 class-1}
+  \end{subfigure}
+  \caption{Decision Boundary and Training Data points for Dataset-2, Case-3}
+  \label{fig:3_3}
+\end{figure}
+\subparagraph{Confusion Matrix}
+The confusion matrix obtained is
+\[
+\mathbf{M} = \left[ {\begin{array}{ccc}
+1611 & 229 & 0\\
+215 & 1651 & 0\\
+11 & 3 & 1704\\
+\end{array}} \right]
+\]
+\\
+
+\subparagraph{Precision, Recall and F-measure} \textcolor{white}{:}
+\begin{table}[h!]
+  \begin{center}
+    \caption{Performance parameters for Dataset-2, Case-3}
+    \label{tab:table1}
+    \begin{tabular}{l|c|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{class} & \textbf{Recall} & \textbf{Precision} & \textbf{F-Measure}\\
+      \hline
+      class-1 & 0.8631921824 & 0.8833333333 & 0.8731466227\\
+      class-2 & 0.8906752412 & 0.865625 & 0.8779714739\\
+      class-3 & 0.9930191972 & 1 & 0.996497373\\
+    \end{tabular}
+  \end{center}
+\end{table}
+\\$\mathbf{Accuracy}$ 91.3$\%,$ $\mathbf{Mean- Precision}$ 0.916$,$ $\mathbf{Mean- Recall}$ 0.915$.$ 
+\newpage
+\paragraph{Case-4: $\mathbf{\Sigma_{i}}$ is arbitary}
+The decision boundary is shown in figure \ref{fig:3_4}
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{3_12_4.png}
+     \caption{case-4: class-1 class-2}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{3_23_4.png}
+    \caption{case-4: class-2 class-3}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{3_31_4.png}
+    \caption{case-4: class-3 class-1}
+  \end{subfigure}
+  \caption{Decision Boundary and Training Data points for Dataset-2, Case-4}
+  \label{fig:3_4}
+\end{figure}
+\subparagraph{Confusion Matrix}
+The confusion matrix obtained is
+\[
+\mathbf{M} = \left[ {\begin{array}{ccc}
+1571 & 263 & 6\\
+183 & 1683 & 0\\
+14 & 3 & 1701\\
+\end{array}} \right]
+\]
+\\
+
+
+\subparagraph{Precision, Recall and F-measure} \textcolor{white}{:}
+\begin{table}[h!]
+  \begin{center}
+    \caption{Performance parameters for Dataset-2, Case-4}
+    \label{tab:table1}
+    \begin{tabular}{l|c|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{class} & \textbf{Recall} & \textbf{Precision} & \textbf{F-Measure}\\
+      \hline
+      class-1 & 0.8575667656 & 0.898911353 & 0.8777524677\\
+      class-2 & 0.9019292605 & 0.8538812785 & 0.8772478499\\
+      class-3 & 0.9895287958 & 0.9964850615 & 0.9929947461\\
+    \end{tabular}
+  \end{center}
+\end{table}
+\\$\mathbf{Accuracy}$ 94.3$\%,$ $\mathbf{Mean- Precision}$ 0.916$,$ $\mathbf{Mean- Recall}$ 0.916$.$
+\newpage
+\subparagraph{Conclusion}
+We can see that all of the above cases on covariance matrix are good approximation for this dataset and any of the approximate form can be used for classification. Now we shown the final decision boundary simultaneously for all the three classes and for all the four cases along with their contour plots superimposed on them in figure \ref{fig:cont_3_4}
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{cont_3_123_1.png}
+     \caption{case-1: interclass decision surface and contour plot}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{cont_3_123_2.png}
+    \caption{case-2: interclass decision surface and contour plot}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{cont_3_123_3.png}
+    \caption{case-3: interclass decision surface and contour plot}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.4\linewidth}
+    \includegraphics[width=\linewidth]{cont_3_123_4.png}
+    \caption{case-4: interclass decision surface and contour plot}
+  \end{subfigure}
+  \caption{decision boundary for all three classes and contour plots}
+  \label{fig:cont_3_4}
+\end{figure}
+\newpage
+\section{Appendix}
+This section includes some of the derivations relating the angle with which the ellipse(constant contour curves) is titled with the axis and the elements of the covariance matrix. This section can be skiped without any loss. The derivation includes all the points discussed in section \ref{appendix}. We first assume general form of elliptical curve in two dimensions as follows\footnote{Note that we are not considering the terms which are because of shift of origin because it would not affect the shape and tilted angle}
+\begin{equation}\label{original}
+ax^{2}+by^{2}+cxy+d=0
+\end{equation}Now we rotate the axis(active rotation) using rotation matrix for two dimensional space as follows
+
+\[
+\left( \begin{array}{c}
+x^{\prime} \\
+y^{\prime}
+\end{array} \right) = 
+\left( \begin{array}{cc}
+\cos\theta & -\sin\theta \\
+\sin\theta & \cos\theta
+\end{array} \right)
+%
+\left( \begin{array}{c}
+x \\
+y
+\end{array} \right)
+\]
+Now we find $x$ and $y$ in terms of primed $x^{\prime}$ and $y^{\prime}$. After simple algebraic calculations and manipulations we obtain following equation in $x^{\prime}$-$y^{\prime}$ coordinate system
+\begin{equation}\label{main}
+\begin{split}
+(a\cos^{2}\theta+b\sin^{2}\theta-c\cos\theta\sin\theta)x^{\prime 2} + (a\sin^{2}\theta+b\cos^{2}\theta+c\cos\theta\sin\theta)y^{\prime 2}&\\
++(2a\cos\theta\sin\theta-2b\sin\theta\cos\theta+c(\cos^{2}\theta-\sin^{2}\theta))x^{\prime}y^{\prime}+d=0
+\end{split}
+\end{equation}Here $\theta$ is the angle with which the coordinate axis are rotated(which we further state that is the angle with which the major and minor axis of the tilted ellipse is making with $x$-$y$ axis). Now we impose the condition that in this coordinate system the above ellipse should be parallel to the axis and is of the standard form
+\begin{equation}
+\frac{x^{\prime 2}}{A^{2}}+\frac{y^{\prime 2}}{B^{2}}=1
+\end{equation}for this we should have coefficient of $x^{\prime}y^{\prime}$ in the equation \ref{main} to be zero which is equivalent as
+\[
+\begin{split}
+2a\cos\theta\sin\theta-2b\sin\theta\cos\theta+c(\cos^{2}\theta-\sin^{2}\theta) &= 0 \\
+(a-b)\sin2\theta+c\cos2\theta &= 0\\
+\end{split}
+\]
+\begin{equation}\label{thet}
+\tan2\theta = \frac{c}{b-a}
+\end{equation}
+This precisly gives the dependence of angle on the coefficients in equation
+\ref{original}. This can be easily proved that if $c=0$ (angle would then be zero acc. to \ref{thet})then the ellipse given by equation \ref{original} would be parallel to the $x$-$y$ axis. Now for this ellipse to be a circle we equate the coefficients of $x^{\prime 2}$ and $y^{\prime 2}$ in equation \ref{main}
+\[
+\begin{split}
+a\cos^{2}\theta+b\sin^{2}\theta-c\cos\theta\sin\theta &= a\sin^{2}\theta+b\cos^{2}\theta+c\cos\theta\sin\theta \\
+a\cos^{2}\theta-a\sin^{2}\theta+b\sin^{2}\theta-b\cos^{2}\theta &=2c\cos\theta\sin\theta \\
+(a-b)\cos2\theta &=c\sin2\theta \\
+\tan2\theta &= \frac{a-b}{c}
+\end{split}
+\]but from equation \ref{thet} we can finally write the above condition as
+\begin{equation}
+-(a-b)^{2}=c^{2}
+\end{equation}which is true only when $a=b$ and $c=0$(this condition is not ad-hoc and makes much more sense as there is no such thing as rotated circle so we can safely consider $c=0$ without loss of generality). So for ellipse to be a circle the coefficients of $x^{2}$ and $y^{2}$ should be equal and you recover the standard equation of circle
+\begin{equation}
+x^{2}+y^{2}=r^{2}
+\end{equation}Now this whole analysis can be used to relate the coefficients of equation \ref{original} to that of the section \ref{appendix} which on comparision with equation \ref{cov} gives us
+\[
+a = \Sigma_{22}
+\]
+\[
+b = \Sigma_{11}
+\]
+\[
+c = -2\Sigma_{12}
+\]and now you can correlate the conclusions given in section \ref{appendix} with the above calculations.
+\bibliographystyle{alpha}
+\bibliography{sample}
+
+\end{document}
